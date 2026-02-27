@@ -119,18 +119,18 @@ export default function PricingPage() {
           <div
             key={plan.id}
             className={cn(
-              "relative rounded-2xl border border-white/[0.06] bg-[#151922] p-5 transition-all hover:border-white/10",
+              "relative overflow-visible rounded-2xl border border-white/[0.06] bg-[#151922] p-5 transition-all hover:border-white/10",
               plan.highlighted && "border-[#22c55e]/30 glow-green-sm"
             )}
           >
             {plan.highlighted && (
-              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                <span className="rounded-full bg-[#22c55e] px-3 py-0.5 text-[10px] font-semibold text-white">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                <span className="inline-block whitespace-nowrap rounded-full bg-[#22c55e] px-4 py-1 text-[10px] font-semibold text-white shadow-lg">
                   Recommended
                 </span>
               </div>
             )}
-            <h3 className="text-sm font-medium text-white/60">{plan.name}</h3>
+            <h3 className={cn("text-sm font-medium text-white/60", plan.highlighted && "mt-1")}>{plan.name}</h3>
             <div className="mt-2">
               <span className="text-2xl font-bold text-white">
                 ₹{plan.price.toLocaleString()}

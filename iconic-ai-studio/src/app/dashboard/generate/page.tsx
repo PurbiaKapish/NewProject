@@ -15,9 +15,10 @@ import {
   Save,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { hasCredits, getRemainingCredits } from "@/lib/credits";
+import { hasCredits, getRemainingCredits, getCreditsForResolution } from "@/lib/credits";
 import {
   generateFashionModelImage,
+  generateMagicPrompt,
   type GenerationResult,
   type GenerationSettings,
 } from "@/lib/mock-ai";
@@ -40,7 +41,18 @@ const SUBCATEGORIES: Record<string, string[]> = {
   Kids: ["Boys", "Girls", "Unisex"],
 };
 
-const BACKGROUNDS = ["Studio White", "Studio Gray", "Outdoor", "Custom"];
+const BACKGROUNDS = [
+  "Studio White",
+  "Studio Black",
+  "Indoor",
+  "Outdoor",
+  "Nature",
+  "Office",
+  "Home Interior",
+  "Street",
+  "Luxury Studio",
+  "Custom Background",
+];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
 
@@ -66,13 +78,11 @@ function FileUpload({
   onClear: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
   const { toast } = useToast();
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
+  const processFile = useCallback(
+    (file: File) => {
       if (!ACCEPTED_TYPES.includes(file.type)) {
         toast({
           title: "Invalid file type",
@@ -98,6 +108,33 @@ function FileUpload({
     [onFile, toast]
   );
 
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) processFile(file);
+    },
+    [processFile]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) processFile(file);
+    },
+    [processFile]
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(false);
+  }, []);
+
   return (
     <div>
       <Label className="mb-2 block text-xs text-white/40">
@@ -118,7 +155,7 @@ function FileUpload({
               onClear();
               if (inputRef.current) inputRef.current.value = "";
             }}
-            className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
+            className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80 transition-colors"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -127,10 +164,25 @@ function FileUpload({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/[0.08] bg-[#151922] text-white/20 transition-all hover:border-[#22c55e]/30 hover:text-white/40"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          className={cn(
+            "flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed transition-all",
+            dragOver
+              ? "border-[#22c55e] bg-[#22c55e]/5 text-[#22c55e]"
+              : required
+                ? "border-[#22c55e]/20 bg-[#151922] text-white/30 hover:border-[#22c55e]/40 hover:text-white/50"
+                : "border-white/[0.08] bg-[#151922] text-white/20 hover:border-[#22c55e]/30 hover:text-white/40"
+          )}
         >
           <Upload className="h-6 w-6" />
-          <span className="text-xs">Upload</span>
+          <span className="text-xs">
+            {dragOver ? "Drop here" : "Click or drag to upload"}
+          </span>
+          {required && !dragOver && (
+            <span className="text-[10px] text-[#22c55e]/60">Required</span>
+          )}
         </button>
       )}
       <input
@@ -163,17 +215,45 @@ export default function GeneratePage() {
   const [numImages, setNumImages] = useState(1);
   const [selectedDim, setSelectedDim] = useState(0);
   const [prompt, setPrompt] = useState("");
+  const [customBackground, setCustomBackground] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
 
   if (!user) return null;
 
   const remaining = getRemainingCredits(user.total_credits, user.used_credits);
 
+  const creditCost = getCreditsForResolution(resolution);
+
   const handleCategoryChange = (value: string) => {
     setCategory(value);
     setSubcategory(SUBCATEGORIES[value][0]);
+  };
+
+  const handleMagicPrompt = async () => {
+    setMagicLoading(true);
+    try {
+      // Simulate brief processing delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const settings: GenerationSettings = {
+        category,
+        subcategory,
+        background: background === "Custom Background" ? customBackground : background,
+        resolution,
+        modelType,
+        modelConsistency,
+      };
+      const enhanced = generateMagicPrompt(settings);
+      setPrompt(enhanced);
+      toast({
+        title: "Prompt enhanced!",
+        description: "Magic prompt has been generated and inserted.",
+      });
+    } finally {
+      setMagicLoading(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -186,10 +266,10 @@ export default function GeneratePage() {
       return;
     }
 
-    if (!hasCredits(user.total_credits, user.used_credits)) {
+    if (!hasCredits(user.total_credits, user.used_credits, resolution)) {
       toast({
-        title: "No credits remaining",
-        description: "Please purchase more credits to continue generating.",
+        title: "Not enough credits",
+        description: `You need ${creditCost} credits for ${resolution} generation. Please purchase more.`,
         variant: "destructive",
       });
       return;
@@ -202,10 +282,11 @@ export default function GeneratePage() {
       const settings: GenerationSettings = {
         category,
         subcategory,
-        background,
+        background: background === "Custom Background" ? customBackground : background,
         resolution,
         modelType,
         modelConsistency,
+        prompt,
       };
 
       const generated = await generateFashionModelImage(frontImage, settings);
@@ -213,7 +294,7 @@ export default function GeneratePage() {
 
       const updated = {
         ...user,
-        used_credits: user.used_credits + 1,
+        used_credits: user.used_credits + creditCost,
       };
       localStorage.setItem("iconic-ai-studio-user", JSON.stringify(updated));
       window.dispatchEvent(new Event("storage"));
@@ -246,6 +327,7 @@ export default function GeneratePage() {
     setCategory("Women");
     setSubcategory("Saree");
     setBackground("Studio White");
+    setCustomBackground("");
     setResolution("2K");
     setModelType("Indian");
     setModelConsistency(false);
@@ -342,10 +424,16 @@ export default function GeneratePage() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 text-xs border-white/[0.08] text-white/40 hover:text-[#22c55e]"
+              onClick={handleMagicPrompt}
+              disabled={magicLoading}
+              className="gap-1.5 text-xs border-white/[0.08] text-white/40 hover:text-[#22c55e] hover:border-[#22c55e]/30 transition-colors"
             >
-              <Sparkles className="h-3 w-3" />
-              Magic Prompt
+              {magicLoading ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Sparkles className="h-3 w-3" />
+              )}
+              {magicLoading ? "Enhancing..." : "Magic Prompt"}
             </Button>
           </div>
         </div>
@@ -364,15 +452,15 @@ export default function GeneratePage() {
           </div>
           <Button
             onClick={handleGenerate}
-            disabled={loading}
-            className="gap-2 rounded-2xl px-6"
+            disabled={loading || !frontImage}
+            className="gap-2 rounded-2xl px-6 transition-all"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            Generate ({remaining})
+            {loading ? "Generating..." : `Generate (${creditCost} cr · ${remaining} left)`}
           </Button>
         </div>
 
@@ -517,6 +605,15 @@ export default function GeneratePage() {
                 ))}
               </SelectContent>
             </Select>
+            {background === "Custom Background" && (
+              <input
+                type="text"
+                value={customBackground}
+                onChange={(e) => setCustomBackground(e.target.value)}
+                placeholder="Describe your background..."
+                className="mt-2 w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#22c55e]/30"
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -530,8 +627,8 @@ export default function GeneratePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2K">2K</SelectItem>
-                  <SelectItem value="4K">4K</SelectItem>
+                  <SelectItem value="2K">2K (2 cr)</SelectItem>
+                  <SelectItem value="4K">4K (3 cr)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

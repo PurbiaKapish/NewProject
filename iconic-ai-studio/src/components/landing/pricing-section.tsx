@@ -103,18 +103,20 @@ function PlanCard({ plan, index }: { plan: Plan; index: number }) {
       custom={index}
       whileHover={{ y: -4 }}
       className={cn(
-        "relative p-6 rounded-2xl flex flex-col",
+        "relative p-6 rounded-2xl flex flex-col overflow-visible",
         "bg-white/5 backdrop-blur-sm border",
-        plan.popular ? "border-gold/50" : "border-white/10"
+        plan.popular ? "border-gold/50 ring-1 ring-gold/20" : "border-white/10"
       )}
     >
       {plan.popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold text-black text-xs font-bold px-3 py-1 rounded-full">
-          Popular
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+          <span className="inline-block whitespace-nowrap rounded-full bg-gold text-black text-xs font-bold px-4 py-1 shadow-lg">
+            Popular
+          </span>
         </div>
       )}
 
-      <h3 className="text-lg font-semibold mb-1">{plan.name}</h3>
+      <h3 className={cn("text-lg font-semibold mb-1", plan.popular && "mt-2")}>{plan.name}</h3>
       <div className="mb-1">
         <span className="text-3xl font-bold font-heading text-gold">
           {plan.price}
