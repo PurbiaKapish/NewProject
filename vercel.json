@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "iconic-ai-studio/package.json",
+      "use": "@vercel/next"
+    }
+  ]
+}
