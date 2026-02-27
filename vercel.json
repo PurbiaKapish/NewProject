@@ -1,6 +1,0 @@
-{
-  "framework": "nextjs",
-  "installCommand": "cd iconic-ai-studio && npm install",
-  "buildCommand": "cd iconic-ai-studio && npm run build",
-  "outputDirectory": "iconic-ai-studio/.next"
-}
