@@ -1,14 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  totalCredits: number;
-  usedCredits: number;
-}
+import type { User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +14,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = "iconic-ai-studio-user";
+const MOCK_USER_ID = "mock-user-1";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -47,32 +41,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const login = useCallback(async (email: string, _password: string) => {
     setUser({
-      id: "mock-user-1",
+      id: MOCK_USER_ID,
       email,
       name: email.split("@")[0],
-      totalCredits: 5,
-      usedCredits: 0,
+      total_credits: 5,
+      used_credits: 0,
+      created_at: new Date().toISOString(),
     });
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const signup = useCallback(async (email: string, _password: string, name: string) => {
     setUser({
-      id: "mock-user-1",
+      id: MOCK_USER_ID,
       email,
       name,
-      totalCredits: 5,
-      usedCredits: 0,
+      total_credits: 5,
+      used_credits: 0,
+      created_at: new Date().toISOString(),
     });
   }, []);
 
   const loginWithGoogle = useCallback(async () => {
     setUser({
-      id: "mock-user-1",
+      id: MOCK_USER_ID,
       email: "user@gmail.com",
       name: "Google User",
-      totalCredits: 5,
-      usedCredits: 0,
+      total_credits: 5,
+      used_credits: 0,
+      created_at: new Date().toISOString(),
     });
   }, []);
 
