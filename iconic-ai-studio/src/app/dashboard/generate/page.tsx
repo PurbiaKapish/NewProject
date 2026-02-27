@@ -227,6 +227,11 @@ export default function GeneratePage() {
 
   const creditCost = getCreditsForResolution(resolution);
 
+  const resolvedBackground =
+    background === "Custom Background"
+      ? customBackground.trim() || "Studio White"
+      : background;
+
   const handleCategoryChange = (value: string) => {
     setCategory(value);
     setSubcategory(SUBCATEGORIES[value][0]);
@@ -240,7 +245,7 @@ export default function GeneratePage() {
       const settings: GenerationSettings = {
         category,
         subcategory,
-        background: background === "Custom Background" ? customBackground : background,
+        background: resolvedBackground,
         resolution,
         modelType,
         modelConsistency,
@@ -282,7 +287,7 @@ export default function GeneratePage() {
       const settings: GenerationSettings = {
         category,
         subcategory,
-        background: background === "Custom Background" ? customBackground : background,
+        background: resolvedBackground,
         resolution,
         modelType,
         modelConsistency,
@@ -627,8 +632,8 @@ export default function GeneratePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2K">2K (2 cr)</SelectItem>
-                  <SelectItem value="4K">4K (3 cr)</SelectItem>
+                  <SelectItem value="2K">2K ({getCreditsForResolution("2K")} cr)</SelectItem>
+                  <SelectItem value="4K">4K ({getCreditsForResolution("4K")} cr)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
