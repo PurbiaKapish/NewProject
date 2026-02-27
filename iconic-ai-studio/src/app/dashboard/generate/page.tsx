@@ -2,7 +2,18 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import Image from "next/image";
-import { Upload, X, Loader2, Download, Sparkles, RefreshCw } from "lucide-react";
+import {
+  Upload,
+  X,
+  Loader2,
+  Download,
+  Sparkles,
+  RefreshCw,
+  Copy,
+  Send,
+  RotateCcw,
+  Save,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { hasCredits, getRemainingCredits } from "@/lib/credits";
 import {
@@ -11,7 +22,6 @@ import {
   type GenerationSettings,
 } from "@/lib/mock-ai";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -22,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const SUBCATEGORIES: Record<string, string[]> = {
@@ -34,6 +43,14 @@ const SUBCATEGORIES: Record<string, string[]> = {
 const BACKGROUNDS = ["Studio White", "Studio Gray", "Outdoor", "Custom"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
+
+const IMAGE_DIMENSIONS = [
+  { label: "1:1", w: 1024, h: 1024 },
+  { label: "4:3", w: 1024, h: 768 },
+  { label: "3:4", w: 768, h: 1024 },
+  { label: "16:9", w: 1024, h: 576 },
+  { label: "9:16", w: 576, h: 1024 },
+];
 
 function FileUpload({
   label,
@@ -83,12 +100,12 @@ function FileUpload({
 
   return (
     <div>
-      <Label className="mb-2 block">
+      <Label className="mb-2 block text-xs text-white/40">
         {label}
         {required && <span className="text-red-400"> *</span>}
       </Label>
       {preview ? (
-        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-white/10">
+        <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[#22c55e]/30 glow-green-sm">
           <Image
             src={preview}
             alt={label}
@@ -101,20 +118,19 @@ function FileUpload({
               onClear();
               if (inputRef.current) inputRef.current.value = "";
             }}
-            className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
+            className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-white/10 bg-white/5 text-white/40 transition-colors hover:border-[#D4AF37]/40 hover:text-white/60"
+          className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/[0.08] bg-[#151922] text-white/20 transition-all hover:border-[#22c55e]/30 hover:text-white/40"
         >
-          <Upload className="h-8 w-8" />
-          <span className="text-sm">Click to upload</span>
-          <span className="text-xs">JPG, PNG — Max 10MB</span>
+          <Upload className="h-6 w-6" />
+          <span className="text-xs">Upload</span>
         </button>
       )}
       <input
@@ -139,8 +155,14 @@ export default function GeneratePage() {
   const [subcategory, setSubcategory] = useState("Saree");
   const [background, setBackground] = useState("Studio White");
   const [resolution, setResolution] = useState<"2K" | "4K">("2K");
-  const [modelType, setModelType] = useState<"Indian" | "International">("Indian");
+  const [modelType, setModelType] = useState<"Indian" | "International">(
+    "Indian"
+  );
   const [modelConsistency, setModelConsistency] = useState(false);
+  const [smoothing, setSmoothing] = useState(false);
+  const [numImages, setNumImages] = useState(1);
+  const [selectedDim, setSelectedDim] = useState(0);
+  const [prompt, setPrompt] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
@@ -189,13 +211,11 @@ export default function GeneratePage() {
       const generated = await generateFashionModelImage(frontImage, settings);
       setResult(generated);
 
-      // Deduct 1 credit (update localStorage directly for mock)
       const updated = {
         ...user,
         used_credits: user.used_credits + 1,
       };
       localStorage.setItem("iconic-ai-studio-user", JSON.stringify(updated));
-      // Force re-render by reloading auth state
       window.dispatchEvent(new Event("storage"));
 
       toast({
@@ -222,234 +242,351 @@ export default function GeneratePage() {
     link.click();
   };
 
+  const handleReset = () => {
+    setCategory("Women");
+    setSubcategory("Saree");
+    setBackground("Studio White");
+    setResolution("2K");
+    setModelType("Indian");
+    setModelConsistency(false);
+    setSmoothing(false);
+    setNumImages(1);
+    setSelectedDim(0);
+    setPrompt("");
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-playfair text-3xl font-bold text-white">
-            Generate
-          </h1>
-          <p className="mt-1 text-white/60">
-            Create AI fashion model images from your product photos
-          </p>
+    <div className="flex gap-6">
+      {/* Center Content Area */}
+      <div className="min-w-0 flex-1 space-y-5">
+        {/* Image preview grid */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* Upload slots */}
+          <FileUpload
+            label="Front Image"
+            required
+            preview={frontImage}
+            onFile={setFrontImage}
+            onClear={() => setFrontImage(null)}
+          />
+          <FileUpload
+            label="Back Image"
+            preview={backImage}
+            onFile={setBackImage}
+            onClear={() => setBackImage(null)}
+          />
+
+          {/* Result or placeholder */}
+          <div>
+            <Label className="mb-2 block text-xs text-white/40">Result</Label>
+            {loading ? (
+              <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-white/[0.06] bg-[#151922]">
+                <Loader2 className="h-8 w-8 animate-spin text-[#22c55e]" />
+              </div>
+            ) : result ? (
+              <div className="group relative aspect-square w-full overflow-hidden rounded-2xl border border-[#22c55e]/30 glow-green">
+                <Image
+                  src={result.imageUrl}
+                  alt="Generated"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex gap-2 pb-3">
+                    <button
+                      onClick={handleDownload}
+                      className="rounded-lg bg-white/20 p-2 text-white backdrop-blur-sm hover:bg-white/30"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setResult(null)}
+                      className="rounded-lg bg-white/20 p-2 text-white backdrop-blur-sm hover:bg-white/30"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-white/[0.06] bg-[#151922]">
+                <Sparkles className="h-6 w-6 text-white/10" />
+                <span className="text-[10px] text-white/15">Output</span>
+              </div>
+            )}
+          </div>
         </div>
-        <Badge variant="outline" className="border-[#D4AF37]/40 text-[#D4AF37]">
-          {remaining} credits remaining
-        </Badge>
-      </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Left column: Upload + Options */}
-        <div className="space-y-6">
-          {/* Upload section */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-lg">Product Images</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <FileUpload
-                  label="Front Image"
-                  required
-                  preview={frontImage}
-                  onFile={setFrontImage}
-                  onClear={() => setFrontImage(null)}
-                />
-                <FileUpload
-                  label="Back Image"
-                  preview={backImage}
-                  onFile={setBackImage}
-                  onClear={() => setBackImage(null)}
-                />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Text prompt area */}
+        <div className="rounded-2xl border border-white/[0.06] bg-[#151922] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <Label className="text-xs text-white/30">Prompt</Label>
+            <button
+              onClick={() => {
+                if (prompt) navigator.clipboard.writeText(prompt);
+              }}
+              className="text-white/20 hover:text-white/50"
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe your desired fashion model image... e.g. 'A professional Indian model wearing the saree in a studio setting with soft lighting'"
+            className="w-full resize-none rounded-xl bg-white/[0.03] p-3 text-sm text-white placeholder:text-white/15 focus:outline-none focus:ring-1 focus:ring-[#22c55e]/30"
+            rows={3}
+          />
+          <div className="mt-2 flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs border-white/[0.08] text-white/40 hover:text-[#22c55e]"
+            >
+              <Sparkles className="h-3 w-3" />
+              Magic Prompt
+            </Button>
+          </div>
+        </div>
 
-          {/* Options section */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-lg">Generation Options</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="mb-2 block">Category</Label>
-                  <Select value={category} onValueChange={handleCategoryChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.keys(SUBCATEGORIES).map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="mb-2 block">Subcategory</Label>
-                  <Select value={subcategory} onValueChange={setSubcategory}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SUBCATEGORIES[category].map((sub) => (
-                        <SelectItem key={sub} value={sub}>
-                          {sub}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label className="mb-2 block">Background</Label>
-                <Select value={background} onValueChange={setBackground}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BACKGROUNDS.map((bg) => (
-                      <SelectItem key={bg} value={bg}>
-                        {bg}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="mb-2 block">Resolution</Label>
-                  <Select
-                    value={resolution}
-                    onValueChange={(v) => setResolution(v as "2K" | "4K")}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2K">2K</SelectItem>
-                      <SelectItem value="4K">4K</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="mb-2 block">Model Type</Label>
-                  <Select
-                    value={modelType}
-                    onValueChange={(v) =>
-                      setModelType(v as "Indian" | "International")
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Indian">Indian</SelectItem>
-                      <SelectItem value="International">International</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-                <Label>Model Consistency</Label>
-                <Switch
-                  checked={modelConsistency}
-                  onCheckedChange={setModelConsistency}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Generate button */}
+        {/* Send bar */}
+        <div className="flex gap-3">
+          <div className="flex flex-1 items-center gap-2 rounded-2xl border border-white/[0.06] bg-[#151922] px-4 py-3">
+            <input
+              type="text"
+              placeholder="Quick message or adjustments..."
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/20 focus:outline-none"
+            />
+            <button className="text-white/20 hover:text-[#22c55e]">
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
           <Button
             onClick={handleGenerate}
             disabled={loading}
-            className="w-full gap-2 py-6 text-base"
-            size="lg"
+            className="gap-2 rounded-2xl px-6"
           >
             {loading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Generating...
-              </>
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <>
-                <Sparkles className="h-5 w-5" />
-                Generate Image — {remaining} credits left
-              </>
+              <Sparkles className="h-4 w-4" />
             )}
+            Generate ({remaining})
           </Button>
         </div>
 
-        {/* Right column: Result */}
-        <div>
-          <Card
-            className={cn(
-              "border-white/10 bg-white/5 backdrop-blur-xl",
-              !result && !loading && "flex min-h-[600px] items-center justify-center"
-            )}
-          >
-            {loading ? (
-              <CardContent className="flex min-h-[600px] flex-col items-center justify-center gap-4">
-                <Loader2 className="h-12 w-12 animate-spin text-[#D4AF37]" />
-                <p className="text-white/60">
-                  Generating your fashion model image...
-                </p>
-                <p className="text-sm text-white/40">
-                  This may take a few seconds
-                </p>
-              </CardContent>
-            ) : result ? (
-              <>
-                <CardHeader>
-                  <CardTitle className="text-lg">Generated Result</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg border border-white/10">
-                    <Image
-                      src={result.imageUrl}
-                      alt="Generated fashion model"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <p className="text-xs text-white/40">
-                    Seed ID: {result.seedId}
-                  </p>
-                  <div className="flex gap-3">
-                    <Button onClick={handleDownload} className="flex-1 gap-2">
-                      <Download className="h-4 w-4" />
-                      Download
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setResult(null)}
-                      className="flex-1 gap-2"
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                      Generate Another
-                    </Button>
-                  </div>
-                </CardContent>
-              </>
-            ) : (
-              <CardContent className="text-center">
-                <div className="mb-4 flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-white/5">
-                  <Sparkles className="h-8 w-8 text-white/20" />
+        {result && (
+          <p className="text-[10px] text-white/20">
+            Seed ID: {result.seedId}
+          </p>
+        )}
+      </div>
+
+      {/* Right Settings Panel */}
+      <div className="hidden w-[300px] shrink-0 lg:block">
+        <div className="rounded-2xl border border-white/[0.06] bg-[#151922] p-5 space-y-5">
+          {/* Number of Images */}
+          <div>
+            <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
+              Number of Images
+            </Label>
+            <div className="flex gap-1.5">
+              {[1, 2, 3, 4].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setNumImages(n)}
+                  className={cn(
+                    "flex-1 rounded-xl py-2 text-xs font-medium transition-all",
+                    numImages === n
+                      ? "bg-[#22c55e]/15 text-[#22c55e] glow-green-sm"
+                      : "bg-white/[0.03] text-white/30 hover:bg-white/[0.06] hover:text-white/50"
+                  )}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Image Dimensions */}
+          <div>
+            <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
+              Image Dimension
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {IMAGE_DIMENSIONS.map((dim, i) => (
+                <button
+                  key={dim.label}
+                  onClick={() => setSelectedDim(i)}
+                  className={cn(
+                    "rounded-xl px-3 py-2 text-xs font-medium transition-all",
+                    selectedDim === i
+                      ? "bg-[#22c55e]/15 text-[#22c55e] glow-green-sm"
+                      : "bg-white/[0.03] text-white/30 hover:bg-white/[0.06] hover:text-white/50"
+                  )}
+                >
+                  {dim.label}
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-[10px] text-white/20">Width</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="256"
+                    max="2048"
+                    step="64"
+                    value={IMAGE_DIMENSIONS[selectedDim].w}
+                    readOnly
+                    className="h-1 flex-1 appearance-none rounded-full bg-white/10 accent-[#22c55e]"
+                  />
+                  <span className="text-xs text-white/30 w-8">{IMAGE_DIMENSIONS[selectedDim].w}</span>
                 </div>
-                <p className="text-white/60">Your generated image will appear here</p>
-                <p className="mt-1 text-sm text-white/40">
-                  Upload a product image and click Generate
-                </p>
-              </CardContent>
-            )}
-          </Card>
+              </div>
+              <div>
+                <label className="mb-1 block text-[10px] text-white/20">Height</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="256"
+                    max="2048"
+                    step="64"
+                    value={IMAGE_DIMENSIONS[selectedDim].h}
+                    readOnly
+                    className="h-1 flex-1 appearance-none rounded-full bg-white/10 accent-[#22c55e]"
+                  />
+                  <span className="text-xs text-white/30 w-8">{IMAGE_DIMENSIONS[selectedDim].h}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Category & Model */}
+          <div>
+            <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
+              Category
+            </Label>
+            <Select value={category} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(SUBCATEGORIES).map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
+              Subcategory
+            </Label>
+            <Select value={subcategory} onValueChange={setSubcategory}>
+              <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUBCATEGORIES[category].map((sub) => (
+                  <SelectItem key={sub} value={sub}>
+                    {sub}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
+              AI Model
+            </Label>
+            <Select value={background} onValueChange={setBackground}>
+              <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BACKGROUNDS.map((bg) => (
+                  <SelectItem key={bg} value={bg}>
+                    {bg}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="mb-2 block text-[10px] text-white/20">Resolution</Label>
+              <Select
+                value={resolution}
+                onValueChange={(v) => setResolution(v as "2K" | "4K")}
+              >
+                <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70 h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2K">2K</SelectItem>
+                  <SelectItem value="4K">4K</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="mb-2 block text-[10px] text-white/20">Model Type</Label>
+              <Select
+                value={modelType}
+                onValueChange={(v) =>
+                  setModelType(v as "Indian" | "International")
+                }
+              >
+                <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70 h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Indian">Indian</SelectItem>
+                  <SelectItem value="International">International</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Toggles */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5">
+              <span className="text-xs text-white/40">Model Consistency</span>
+              <Switch
+                checked={modelConsistency}
+                onCheckedChange={setModelConsistency}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5">
+              <span className="text-xs text-white/40">Smoothing Image</span>
+              <Switch
+                checked={smoothing}
+                onCheckedChange={setSmoothing}
+              />
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              className="flex-1 gap-1.5 text-xs border-white/[0.06]"
+              onClick={handleReset}
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reset
+            </Button>
+            <Button className="flex-1 gap-1.5 text-xs">
+              <Save className="h-3.5 w-3.5" />
+              Save
+            </Button>
+          </div>
         </div>
       </div>
     </div>

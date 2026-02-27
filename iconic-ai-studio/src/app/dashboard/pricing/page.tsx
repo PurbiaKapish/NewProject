@@ -4,15 +4,7 @@ import { Check } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getRemainingCredits } from "@/lib/credits";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { PricingPlan } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -112,64 +104,63 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="font-playfair text-3xl font-bold text-white">
-          Pricing
-        </h1>
-        <p className="mt-1 text-white/60">
+        <h1 className="text-2xl font-semibold text-white">Pricing</h1>
+        <p className="mt-1 text-sm text-white/40">
           You currently have{" "}
-          <span className="font-semibold text-[#D4AF37]">{remaining}</span>{" "}
+          <span className="font-semibold text-[#22c55e]">{remaining}</span>{" "}
           credits remaining
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => (
-          <Card
+          <div
             key={plan.id}
             className={cn(
-              "relative border-white/10 bg-white/5 backdrop-blur-xl transition-colors hover:border-[#D4AF37]/30",
-              plan.highlighted && "border-[#D4AF37]/50 shadow-lg shadow-[#D4AF37]/5"
+              "relative rounded-2xl border border-white/[0.06] bg-[#151922] p-5 transition-all hover:border-white/10",
+              plan.highlighted && "border-[#22c55e]/30 glow-green-sm"
             )}
           >
             {plan.highlighted && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge>Recommended</Badge>
-              </div>
-            )}
-            <CardHeader>
-              <CardTitle className="text-lg">{plan.name}</CardTitle>
-              <div className="mt-2">
-                <span className="text-3xl font-bold text-white">
-                  ₹{plan.price.toLocaleString()}
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-[#22c55e] px-3 py-0.5 text-[10px] font-semibold text-white">
+                  Recommended
                 </span>
               </div>
-              <p className="text-sm text-white/40">{plan.credits} credits</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {plan.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm text-white/70"
-                  >
-                    <Check className="h-4 w-4 shrink-0 text-[#D4AF37]" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={handlePurchase}
-                className="w-full"
-                variant={plan.highlighted ? "default" : "secondary"}
-              >
-                Purchase
-              </Button>
-            </CardFooter>
-          </Card>
+            )}
+            <h3 className="text-sm font-medium text-white/60">{plan.name}</h3>
+            <div className="mt-2">
+              <span className="text-2xl font-bold text-white">
+                ₹{plan.price.toLocaleString()}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-white/20">{plan.credits} credits</p>
+
+            <ul className="mt-4 space-y-2">
+              {plan.features.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-center gap-2 text-xs text-white/40"
+                >
+                  <Check className="h-3.5 w-3.5 shrink-0 text-[#22c55e]" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              onClick={handlePurchase}
+              className={cn(
+                "mt-5 w-full text-xs",
+                !plan.highlighted && "bg-white/5 text-white/60 hover:bg-white/10 shadow-none"
+              )}
+              variant={plan.highlighted ? "default" : "secondary"}
+            >
+              Purchase
+            </Button>
+          </div>
         ))}
       </div>
     </div>

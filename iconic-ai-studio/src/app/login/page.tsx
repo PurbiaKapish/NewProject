@@ -47,13 +47,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-dark px-4">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold/5 via-transparent to-transparent" />
+    <div className="flex min-h-screen items-center justify-center bg-[#0f1117] px-4">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent" />
 
-      <Card className="relative w-full max-w-md border-white/10 bg-white/5 backdrop-blur-xl">
+      <Card className="relative w-full max-w-md border-white/[0.06] bg-[#151922] backdrop-blur-xl">
         <CardHeader className="space-y-1 text-center">
-          <div className="mb-2 font-heading text-2xl font-bold tracking-wide text-gold">
-            IconicAI Studio
+          <div className="mb-2 text-2xl font-bold tracking-wide text-white">
+            Iconic<span className="text-[#22c55e]">AI</span>
           </div>
           <CardTitle className="text-2xl text-white">Welcome Back</CardTitle>
           <CardDescription>Sign in to your account to continue</CardDescription>
@@ -104,7 +104,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-white/60">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-gold hover:text-gold-light underline-offset-4 hover:underline">
+              <Link href="/signup" className="text-[#22c55e] hover:text-[#4ade80] underline-offset-4 hover:underline">
                 Sign Up
               </Link>
             </p>

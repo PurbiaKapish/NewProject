@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Wand2, Clock, CreditCard, ImageIcon, Sparkles } from "lucide-react";
+import { Wand2, Clock, CreditCard, ImageIcon, Sparkles, Zap, TrendingUp } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getRemainingCredits } from "@/lib/credits";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -20,60 +18,55 @@ export default function DashboardPage() {
       : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Welcome */}
       <div>
-        <h1 className="font-playfair text-3xl font-bold text-white">
+        <h1 className="text-2xl font-semibold text-white">
           Welcome back, {user.name}
         </h1>
-        <p className="mt-1 text-white/60">
+        <p className="mt-1 text-sm text-white/40">
           Here&apos;s an overview of your account
         </p>
       </div>
 
       {/* Stats cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-white/60">
-              Credits Remaining
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-[#D4AF37]">
-              {remaining}{" "}
-              <span className="text-sm font-normal text-white/40">
-                / {user.total_credits}
-              </span>
-            </p>
-            <Progress value={creditPercent} className="mt-3 h-2" />
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-white/[0.06] bg-[#151922] p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-wider text-white/30">Credits</p>
+            <Zap className="h-4 w-4 text-[#22c55e]" />
+          </div>
+          <p className="mt-3 text-3xl font-bold text-white">
+            {remaining}
+            <span className="ml-1 text-sm font-normal text-white/20">/ {user.total_credits}</span>
+          </p>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-400"
+              style={{ width: `${creditPercent}%` }}
+            />
+          </div>
+        </div>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-white/60">
-              Total Generations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-white">0</p>
-            <p className="mt-1 text-xs text-white/40">Lifetime</p>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-white/[0.06] bg-[#151922] p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-wider text-white/30">Generations</p>
+            <TrendingUp className="h-4 w-4 text-white/20" />
+          </div>
+          <p className="mt-3 text-3xl font-bold text-white">0</p>
+          <p className="mt-1 text-xs text-white/20">Lifetime</p>
+        </div>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-white/60">
-              Images This Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-white">0</p>
-            <p className="mt-1 text-xs text-white/40">
-              {new Date().toLocaleString("default", { month: "long" })}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-white/[0.06] bg-[#151922] p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-wider text-white/30">This Month</p>
+            <ImageIcon className="h-4 w-4 text-white/20" />
+          </div>
+          <p className="mt-3 text-3xl font-bold text-white">0</p>
+          <p className="mt-1 text-xs text-white/20">
+            {new Date().toLocaleString("default", { month: "long" })}
+          </p>
+        </div>
       </div>
 
       {/* Quick actions */}
@@ -98,28 +91,37 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Recent generations */}
+      {/* Recent generations - Image Grid Preview */}
       <div>
-        <h2 className="mb-4 text-xl font-semibold text-white">
+        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-white/30">
           Recent Generations
         </h2>
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
-              <ImageIcon className="h-8 w-8 text-white/20" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Empty state cards */}
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="group relative aspect-square overflow-hidden rounded-2xl border border-white/[0.06] bg-[#151922] transition-all hover:border-white/10"
+            >
+              <div className="flex h-full flex-col items-center justify-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5">
+                  <ImageIcon className="h-6 w-6 text-white/10" />
+                </div>
+                {i === 1 && (
+                  <>
+                    <p className="text-sm text-white/20">No images yet</p>
+                    <Link href="/dashboard/generate">
+                      <Button size="sm" className="gap-1.5 text-xs">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Generate
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
-            <p className="text-white/60">No generations yet</p>
-            <p className="mt-1 text-sm text-white/40">
-              Start creating stunning AI fashion images
-            </p>
-            <Link href="/dashboard/generate" className="mt-4">
-              <Button size="sm" className="gap-2">
-                <Sparkles className="h-4 w-4" />
-                Get Started
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

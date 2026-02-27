@@ -4,52 +4,65 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Wand2,
-  Clock,
+  Home,
+  RefreshCw,
+  Users,
   CreditCard,
-  UserCircle,
+  Settings,
   LogOut,
   Menu,
   X,
+  MessageSquare,
+  Plus,
+  ChevronDown,
+  Zap,
 } from "lucide-react";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { getRemainingCredits } from "@/lib/credits";
-import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Generate", href: "/dashboard/generate", icon: Wand2 },
-  { label: "History", href: "/dashboard/history", icon: Clock },
+  { label: "Home", href: "/dashboard", icon: Home },
+  { label: "Generate", href: "/dashboard/generate", icon: RefreshCw },
+  { label: "History", href: "/dashboard/history", icon: Users },
   { label: "Pricing", href: "/dashboard/pricing", icon: CreditCard },
-  { label: "Profile", href: "/dashboard/profile", icon: UserCircle },
+  { label: "Settings", href: "/dashboard/profile", icon: Settings },
+];
+
+const chatItems = [
+  { id: "1", label: "Fashion Saree Model" },
+  { id: "2", label: "Casual Shirt Photo" },
+  { id: "3", label: "Kids Ethnic Wear" },
 ];
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatsExpanded, setChatsExpanded] = useState(true);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
-        <div className="text-white/60">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#0f1117]">
+        <div className="flex items-center gap-3 text-white/60">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-[#22c55e]" />
+          Loading...
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="flex min-h-screen items-center justify-center bg-[#0f1117]">
         <div className="text-center space-y-4">
           <h2 className="text-2xl font-semibold text-white">
             Please log in to continue
           </h2>
           <Link
             href="/login"
-            className="inline-block rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-medium text-black hover:from-amber-600 hover:to-yellow-600"
+            className="inline-block rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-3 text-sm font-medium text-white hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/20"
           >
             Go to Login
           </Link>
@@ -63,12 +76,20 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const sidebar = (
     <div className="flex h-full flex-col justify-between">
       <div>
-        <div className="px-6 py-6">
-          <h1 className="font-playfair text-2xl font-bold text-[#D4AF37]">
-            IconicAI Studio
-          </h1>
+        {/* Logo */}
+        <div className="px-5 py-5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#22c55e]/15">
+              <Zap className="h-5 w-5 text-[#22c55e]" />
+            </div>
+            <span className="text-lg font-semibold text-white tracking-tight">
+              Iconic<span className="text-[#22c55e]">AI</span>
+            </span>
+          </div>
         </div>
-        <nav className="mt-2 space-y-1 px-3">
+
+        {/* Navigation */}
+        <nav className="mt-1 space-y-0.5 px-3">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -77,35 +98,88 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all",
                   isActive
-                    ? "bg-[#D4AF37]/15 text-[#D4AF37]"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                    ? "bg-[#22c55e]/10 text-[#22c55e] glow-green-sm"
+                    : "text-white/50 hover:bg-white/5 hover:text-white/80"
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-[18px] w-[18px]" />
                 {item.label}
               </Link>
             );
           })}
         </nav>
+
+        {/* Chats Section */}
+        <div className="mt-6 px-3">
+          <button
+            onClick={() => setChatsExpanded(!chatsExpanded)}
+            className="flex w-full items-center justify-between px-3 py-2 text-xs font-medium uppercase tracking-wider text-white/30"
+          >
+            Chats
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 transition-transform",
+                chatsExpanded && "rotate-180"
+              )}
+            />
+          </button>
+          {chatsExpanded && (
+            <div className="mt-1 space-y-0.5">
+              {chatItems.map((chat) => (
+                <button
+                  key={chat.id}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <span className="truncate">{chat.label}</span>
+                </button>
+              ))}
+              <button className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-white/10 px-3 py-2 text-[13px] text-white/30 transition-colors hover:border-[#22c55e]/30 hover:text-[#22c55e]/70">
+                <Plus className="h-3.5 w-3.5" />
+                New Chat
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="px-3 pb-6">
-        <button
-          onClick={logout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/5 hover:text-white"
-        >
-          <LogOut className="h-5 w-5" />
-          Logout
-        </button>
+
+      {/* User Profile Card at Bottom */}
+      <div className="px-3 pb-4">
+        <div className="rounded-2xl bg-[#1a1f2e] p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-sm font-semibold text-white">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-white">{user.name}</p>
+              <p className="truncate text-xs text-white/40">{user.email}</p>
+            </div>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <Link
+              href="/dashboard/pricing"
+              className="flex-1 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-3 py-1.5 text-center text-xs font-medium text-white hover:from-green-600 hover:to-emerald-600"
+            >
+              Upgrade
+            </Link>
+            <button
+              onClick={logout}
+              className="rounded-lg bg-white/5 px-3 py-1.5 text-xs text-white/50 hover:bg-white/10 hover:text-white"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[#0f1117]">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-white/10 bg-[#0a0a0f] md:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-white/[0.06] bg-[#0f1117] md:block">
         {sidebar}
       </aside>
 
@@ -120,13 +194,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 bg-[#0a0a0f] transition-transform md:hidden",
+          "fixed inset-y-0 left-0 z-50 w-[260px] border-r border-white/[0.06] bg-[#0f1117] transition-transform md:hidden",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <button
           onClick={() => setSidebarOpen(false)}
-          className="absolute right-3 top-5 text-white/60 hover:text-white"
+          className="absolute right-3 top-5 text-white/40 hover:text-white"
         >
           <X className="h-5 w-5" />
         </button>
@@ -134,25 +208,31 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <div className="md:ml-64">
+      <div className="md:ml-[260px]">
         {/* Top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-[#0a0a0f]/80 px-4 py-3 backdrop-blur-lg md:px-8">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="text-white/60 hover:text-white md:hidden"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="hidden md:block" />
-          <div className="flex items-center gap-4">
-            <Badge variant="outline" className="border-[#D4AF37]/40 text-[#D4AF37]">
-              {remaining} credits
-            </Badge>
-            <span className="text-sm text-white/60">{user.name}</span>
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/[0.06] bg-[#0f1117]/90 px-4 py-3 backdrop-blur-xl md:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="text-white/40 hover:text-white md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <h2 className="text-sm font-medium text-white/80">Project 1</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 rounded-lg bg-[#151922] px-3 py-1.5 text-xs">
+              <Zap className="h-3.5 w-3.5 text-[#22c55e]" />
+              <span className="text-white/60">{remaining}</span>
+              <span className="text-white/30">tokens</span>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-xs font-semibold text-white">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
           </div>
         </header>
 
-        <main className="p-4 md:p-8">{children}</main>
+        <main className="p-4 md:p-6">{children}</main>
       </div>
 
       <Toaster />

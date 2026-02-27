@@ -4,9 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Download, ImageIcon, PackageOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface HistoryItem {
   id: string;
@@ -20,7 +18,7 @@ const DEMO_ITEMS: HistoryItem[] = [
   {
     id: "demo-1",
     imageUrl:
-      "https://placehold.co/512x768/1a1a2e/D4AF37?text=Fashion+Model&font=playfair-display",
+      "https://placehold.co/512x768/151922/22c55e?text=Fashion+Model&font=roboto",
     category: "Women — Saree",
     resolution: "2K",
     createdAt: new Date().toISOString(),
@@ -47,13 +45,11 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-playfair text-3xl font-bold text-white">
-            History
-          </h1>
-          <p className="mt-1 text-white/60">
+          <h1 className="text-2xl font-semibold text-white">History</h1>
+          <p className="mt-1 text-sm text-white/40">
             Browse your previously generated images
           </p>
         </div>
@@ -68,20 +64,18 @@ export default function HistoryPage() {
       </div>
 
       {items.length === 0 ? (
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
-              <ImageIcon className="h-8 w-8 text-white/20" />
-            </div>
-            <p className="text-white/60">No generations yet. Start creating!</p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/[0.06] bg-[#151922] py-16">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-white/5">
+            <ImageIcon className="h-7 w-7 text-white/10" />
+          </div>
+          <p className="text-sm text-white/30">No generations yet. Start creating!</p>
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <Card
+            <div
               key={item.id}
-              className="group overflow-hidden border-white/10 bg-white/5 backdrop-blur-xl"
+              className="group overflow-hidden rounded-2xl border border-white/[0.06] bg-[#151922] transition-all hover:border-white/10"
             >
               <div className="relative aspect-[2/3] w-full overflow-hidden">
                 <Image
@@ -91,33 +85,39 @@ export default function HistoryPage() {
                   className="object-cover transition-transform group-hover:scale-105"
                   unoptimized
                 />
+                <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    onClick={() => handleDownload(item)}
+                    className="mb-4 rounded-lg bg-white/20 p-2.5 text-white backdrop-blur-sm hover:bg-white/30"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-              <CardContent className="p-4">
+              <div className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm text-white/60">
+                    <p className="text-xs text-white/30">
                       {new Date(item.createdAt).toLocaleDateString()}
                     </p>
                     <div className="flex gap-2">
-                      <Badge variant="secondary" className="text-xs">
+                      <span className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] text-white/40">
                         {item.category}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      </span>
+                      <span className="rounded-lg bg-[#22c55e]/10 px-2 py-0.5 text-[10px] text-[#22c55e]">
                         {item.resolution}
-                      </Badge>
+                      </span>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={() => handleDownload(item)}
-                    className="text-white/60 hover:text-white"
+                    className="rounded-lg p-2 text-white/20 hover:bg-white/5 hover:text-white/50"
                   >
                     <Download className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

@@ -1,18 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #f0f0f0;
-  --gold: #D4AF37;
-  --gold-light: #E5C76B;
-  --gold-dark: #B8960C;
-  --dark-card: #1a1a2e;
-  --dark-border: #2a2a3e;
-  --dark-surface: #12121a;
+  --background: #0f1117;
+  --foreground: #e4e4e7;
+  --accent: #22c55e;
+  --accent-light: #4ade80;
+  --accent-dark: #16a34a;
+  --dark-card: #151922;
+  --dark-border: #1e2330;
+  --dark-surface: #0f1117;
 }
 
 body {
@@ -21,12 +21,14 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Playfair Display", serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .glow-green {
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.15), 0 0 3px rgba(34, 197, 94, 0.3);
+  }
+  .glow-green-sm {
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.1), 0 0 2px rgba(34, 197, 94, 0.2);
   }
 }

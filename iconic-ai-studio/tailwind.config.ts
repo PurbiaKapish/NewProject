@@ -9,23 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        gold: {
-          DEFAULT: "#D4AF37",
-          light: "#E5C76B",
-          dark: "#B8960C",
+        accent: {
+          DEFAULT: "#22c55e",
+          light: "#4ade80",
+          dark: "#16a34a",
         },
         background: "var(--background)",
         foreground: "var(--foreground)",
         dark: {
-          DEFAULT: "#0a0a0f",
-          card: "#1a1a2e",
-          border: "#2a2a3e",
-          surface: "#12121a",
+          DEFAULT: "#0f1117",
+          card: "#151922",
+          border: "#1e2330",
+          surface: "#0f1117",
         },
       },
       fontFamily: {
-        heading: ["Playfair Display", "serif"],
         body: ["Inter", "sans-serif"],
+      },
+      borderRadius: {
+        xl: "12px",
+        "2xl": "16px",
       },
       keyframes: {
         "fade-in": {
