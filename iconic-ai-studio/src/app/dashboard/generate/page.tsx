@@ -503,7 +503,7 @@ export default function GeneratePage() {
 
           <div>
             <Label className="mb-2.5 block text-xs font-medium text-white/30 uppercase tracking-wider">
-              AI Model
+              Background
             </Label>
             <Select value={background} onValueChange={setBackground}>
               <SelectTrigger className="rounded-xl border-white/[0.06] bg-white/[0.03] text-white/70">

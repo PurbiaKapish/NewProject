@@ -224,7 +224,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-1.5 rounded-lg bg-[#151922] px-3 py-1.5 text-xs">
               <Zap className="h-3.5 w-3.5 text-[#22c55e]" />
               <span className="text-white/60">{remaining}</span>
-              <span className="text-white/30">tokens</span>
+              <span className="text-white/30">credits</span>
             </div>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-xs font-semibold text-white">
               {user.name.charAt(0).toUpperCase()}
