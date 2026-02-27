@@ -28,9 +28,17 @@ const navItems = [
 ];
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+        <div className="text-white/60">Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

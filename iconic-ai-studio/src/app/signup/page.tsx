@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { useAuth } from "@/lib/auth-context";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -22,8 +24,10 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { toast } = useToast();
+  const { signup, loginWithGoogle } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -35,17 +39,23 @@ export default function SignupPage() {
       return;
     }
 
-    toast({
-      title: "Configuration Required",
-      description: "Signup functionality requires Supabase configuration",
-    });
+    try {
+      await signup(email, password, name);
+      toast({ title: "Account created!", description: "Welcome to IconicAI Studio." });
+      router.push("/dashboard");
+    } catch {
+      toast({ title: "Error", description: "Signup failed. Please try again." });
+    }
   };
 
-  const handleGoogleSignUp = () => {
-    toast({
-      title: "Configuration Required",
-      description: "Signup functionality requires Supabase configuration",
-    });
+  const handleGoogleSignUp = async () => {
+    try {
+      await loginWithGoogle();
+      toast({ title: "Welcome!", description: "Signed in with Google." });
+      router.push("/dashboard");
+    } catch {
+      toast({ title: "Error", description: "Google sign up failed." });
+    }
   };
 
   return (

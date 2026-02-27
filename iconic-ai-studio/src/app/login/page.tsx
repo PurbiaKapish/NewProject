@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,25 +16,34 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
+  const { login, loginWithGoogle } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Configuration Required",
-      description: "Login functionality requires Supabase configuration",
-    });
+    try {
+      await login(email, password);
+      toast({ title: "Welcome back!", description: "Signed in successfully." });
+      router.push("/dashboard");
+    } catch {
+      toast({ title: "Error", description: "Login failed. Please try again." });
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    toast({
-      title: "Configuration Required",
-      description: "Login functionality requires Supabase configuration",
-    });
+  const handleGoogleSignIn = async () => {
+    try {
+      await loginWithGoogle();
+      toast({ title: "Welcome!", description: "Signed in with Google." });
+      router.push("/dashboard");
+    } catch {
+      toast({ title: "Error", description: "Google sign in failed." });
+    }
   };
 
   return (
