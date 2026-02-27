@@ -1,2 +1,10 @@
-"example.log" 
-"node_modules/" 
+example.log
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.env.production
+.vercel
