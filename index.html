@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="Upload your Meesho order photos for Iconic Prints Polaroid printing.">
+  <meta name="theme-color" content="#FF5722">
+  <title>Iconic Prints — Upload Photos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── HEADER ───────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🖼️</div>
+      <div class="logo-text">
+        <span>Iconic Prints</span>
+        <span class="sub">Polaroid Printing</span>
+      </div>
+    </a>
+    <nav class="nav-actions">
+      <button id="langToggleBtn"  class="icon-btn lang-btn" title="Switch language">हि</button>
+      <button id="themeToggleBtn" class="icon-btn" title="Toggle theme">🌙</button>
+      <button id="hamburgerBtn"   class="hamburger-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ── SIDE NAV ─────────────────────────────────────────── -->
+<div id="navBackdrop" class="nav-backdrop"></div>
+<nav id="sideNav" class="side-nav">
+  <button id="sideNavClose" class="side-nav-close">✕</button>
+  <p class="nav-section-title" data-t="nav_pages">Pages</p>
+  <a href="index.html"   class="nav-link" data-page="index.html">
+    <span class="nav-icon">📸</span> <span data-t="nav_home">Upload Photos</span>
+  </a>
+  <a href="tutorial.html" class="nav-link" data-page="tutorial.html">
+    <span class="nav-icon">📖</span> <span data-t="nav_tutorial">How to Use</span>
+  </a>
+  <a href="contact.html"  class="nav-link" data-page="contact.html">
+    <span class="nav-icon">💬</span> <span data-t="nav_contact">Contact Us</span>
+  </a>
+  <a href="legal.html"    class="nav-link" data-page="legal.html">
+    <span class="nav-icon">📄</span> <span data-t="nav_legal">Legal &amp; Policy</span>
+  </a>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-badge">🖼️ Polaroid Printing Service</div>
+  <h1>Upload your<br><span class="text-brand">Meesho photos</span></h1>
+  <p>Get your photos printed as beautiful Polaroids.<br>
+     Simple, fast, and delivered to your door.</p>
+</div>
+
+<!-- ── STEP PROGRESS ────────────────────────────────────── -->
+<div class="step-progress" id="stepProgress">
+  <div class="step-item active" id="si1">
+    <div class="step-dot">1</div>
+    <div class="step-label">Phone</div>
+  </div>
+  <div class="step-item" id="si2">
+    <div class="step-dot">2</div>
+    <div class="step-label">Order ID</div>
+  </div>
+  <div class="step-item" id="si3">
+    <div class="step-dot">3</div>
+    <div class="step-label">Pack</div>
+  </div>
+  <div class="step-item" id="si4">
+    <div class="step-dot">4</div>
+    <div class="step-label">Photos</div>
+  </div>
+  <div class="step-item" id="si5">
+    <div class="step-dot">5</div>
+    <div class="step-label">Preview</div>
+  </div>
+  <div class="step-item" id="si6">
+    <div class="step-dot">6</div>
+    <div class="step-label">Review</div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────── -->
+<main class="main-content">
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 1 — PHONE NUMBER              ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel active" id="step1">
+    <div class="step-header">
+      <div class="step-num">Step 1 of 6</div>
+      <h2 data-t="step1_title">Your Phone Number</h2>
+      <p  data-t="step1_desc">We'll use this to contact you about your order.</p>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <div class="label-row">
+          <label for="phoneInput" class="form-label" data-t="step1_lbl">WhatsApp Number</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1rem;color:var(--text-muted);white-space:nowrap;">🇮🇳 +91</span>
+          <input
+            type="tel"
+            id="phoneInput"
+            class="input"
+            data-t-ph="step1_ph"
+            placeholder="e.g. 9876543210"
+            maxlength="10"
+            inputmode="numeric"
+            pattern="[6-9][0-9]{9}"
+            autocomplete="tel-local"
+          >
+        </div>
+        <p class="field-hint" data-t="step1_hint">Enter 10-digit number without country code</p>
+        <p class="field-error" id="phoneErr"></p>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-primary btn-full btn-lg" data-next="2">
+        <span data-t="btn_next">Continue →</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 2 — MEESHO ORDER ID           ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel" id="step2">
+    <div class="step-header">
+      <div class="step-num">Step 2 of 6</div>
+      <h2 data-t="step2_title">Your Meesho Order ID</h2>
+      <p  data-t="step2_desc">Type your Order ID, or upload a screenshot and we'll detect it.</p>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <div class="label-row">
+          <label for="orderIdInput" class="form-label" data-t="step2_lbl">Order ID</label>
+          <div class="tooltip-wrap">
+            <button class="tooltip-trigger">?</button>
+            <div class="tooltip-box" data-t="step2_tooltip">
+              Open Meesho → tap "My Orders" → select your order → copy the Order ID shown at the top.
+            </div>
+          </div>
+        </div>
+        <input
+          type="text"
+          id="orderIdInput"
+          class="input"
+          data-t-ph="step2_ph"
+          placeholder="e.g. 40512345678"
+          autocomplete="off"
+          spellcheck="false"
+          inputmode="text"
+          style="font-size:1.05rem;letter-spacing:0.5px;"
+        >
+        <p class="field-hint" data-t="step2_hint">Find it in Meesho app → My Orders → Order Details</p>
+        <p class="field-error" id="orderIdErr"></p>
+      </div>
+
+      <div class="divider"><span data-t="step2_or">OR</span></div>
+
+      <!-- OCR Screenshot Upload -->
+      <label class="ocr-dropzone">
+        <input type="file" id="ocrFileInput" accept="image/*" capture="environment">
+        <div class="ocr-icon">📷</div>
+        <h4 data-t="step2_scan_title">Upload Order Screenshot</h4>
+        <p  data-t="step2_scan_desc" class="text-muted text-sm">Take a screenshot of your Meesho order page</p>
+      </label>
+
+      <div class="ocr-status" id="ocrStatus">
+        <div class="spinner"></div>
+        <span class="ocr-msg" data-t="step2_detecting">Reading your screenshot…</span>
+      </div>
+
+      <div class="ocr-result" id="ocrResult">
+        <span class="icon">✅</span>
+        <div>
+          <div class="detected-label" data-t="step2_detected">Order ID detected!</div>
+          <div class="detected-id" id="ocrDetected"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary btn-back" data-prev="1" data-t="btn_back">← Back</button>
+      <button class="btn btn-primary" data-next="3"><span data-t="btn_next">Continue →</span></button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 3 — PACK + QUANTITY           ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel" id="step3">
+    <div class="step-header">
+      <div class="step-num">Step 3 of 6</div>
+      <h2 data-t="step3_title">Choose Your Pack</h2>
+      <p  data-t="step3_desc">Select how many Polaroid photos you want printed.</p>
+    </div>
+    <div class="card">
+      <p class="form-label" data-t="step3_pack_lbl">Number of Photos</p>
+      <div class="pack-grid" id="packGrid"></div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="label-row" style="margin-bottom:12px;">
+          <label class="form-label" style="margin:0;" data-t="step3_qty_lbl">Quantity Ordered on Meesho</label>
+        </div>
+        <p class="field-hint" style="margin:0 0 12px;" data-t="step3_qty_hint">How many units did you order?</p>
+        <div class="qty-row">
+          <button class="qty-btn" id="qtyMinus">−</button>
+          <div class="qty-val" id="qtyVal">1</div>
+          <button class="qty-btn" id="qtyPlus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary btn-back" data-prev="2" data-t="btn_back">← Back</button>
+      <button class="btn btn-primary" data-next="4"><span data-t="btn_next">Continue →</span></button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 4 — UPLOAD PHOTOS             ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel" id="step4">
+    <div class="step-header">
+      <div class="step-num">Step 4 of 6</div>
+      <h2 data-t="step4_title">Upload Your Photos</h2>
+      <p  data-t="step4_desc">Upload original photos (not screenshots) for best print quality.</p>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">💡</span>
+      <span>Upload <strong>original, high-resolution photos</strong> — not screenshots. Low-res photos may print blurry.</span>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <label class="upload-zone" id="uploadZone">
+        <input type="file" id="photoInput" accept="image/*" multiple>
+        <div class="uz-icon">📸</div>
+        <h3 data-t="step4_zone_title">Tap to select or drag photos here</h3>
+        <p  data-t="step4_zone_desc" class="text-sm">JPG, PNG, HEIC — multiple photos supported</p>
+      </label>
+      <div style="padding:0 16px 16px;">
+        <span class="photo-count-badge" id="photoBadge" style="display:none;">0 photos selected</span>
+        <div class="photo-grid" id="photoGrid"></div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary btn-back" data-prev="3" data-t="btn_back">← Back</button>
+      <button class="btn btn-primary" data-next="5"><span data-t="btn_next">Continue →</span></button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 5 — POLAROID PREVIEW          ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel" id="step5">
+    <div class="step-header">
+      <div class="step-num">Step 5 of 6</div>
+      <h2 data-t="step5_title">Polaroid Frame Preview</h2>
+      <p  data-t="step5_desc">Optional — see how your photo will look when printed.</p>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="polaroid-toggle-row" id="polaroidToggleRow">
+        <div class="polaroid-toggle-info">
+          <h4 data-t="step5_toggle">Preview photos in Polaroid frame</h4>
+          <p  data-t="step5_subtitle">Drag to reposition your photo inside the frame.</p>
+        </div>
+        <div class="toggle-switch" id="polaroidSwitch">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+
+      <div class="polaroid-area" id="polaroidArea" style="padding:0 16px 16px;">
+        <div class="polaroid-nav">
+          <button class="btn btn-secondary btn-sm" id="polaroidPrev" data-t="step5_prev">← Prev</button>
+          <span class="polaroid-counter" id="polaroidCounter">1 / 1</span>
+          <button class="btn btn-secondary btn-sm" id="polaroidNext" data-t="step5_next">Next →</button>
+        </div>
+        <div class="polaroid-stage">
+          <div class="polaroid-card">
+            <div class="polaroid-canvas-wrap" id="polaroidImgWrap">
+              <!-- image inserted by JS -->
+            </div>
+            <div class="polaroid-bottom">Iconic Prints ✦ Polaroid</div>
+          </div>
+        </div>
+        <p class="polaroid-hint text-center text-sm text-muted">
+          Drag the photo to reposition it inside the frame.
+        </p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary btn-back" data-prev="4" data-t="btn_back">← Back</button>
+      <button class="btn btn-primary" data-next="6"><span data-t="btn_next">Continue →</span></button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  STEP 6 — ORDER SUMMARY + SUBMIT    ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="step-panel" id="step6">
+    <div class="step-header">
+      <div class="step-num">Step 6 of 6</div>
+      <h2 data-t="step6_title">Order Summary</h2>
+      <p  data-t="step6_desc">Please review your details before submitting.</p>
+    </div>
+
+    <div class="card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="s-key" data-t="sum_phone">WhatsApp Number</div>
+          <div class="s-val" id="sumPhone">—</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-key" data-t="sum_orderid">Meesho Order ID</div>
+          <div class="s-val" id="sumOrderId" style="font-size:0.82rem;word-break:break-all;">—</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-key" data-t="sum_pack">Pack Size</div>
+          <div class="s-val" id="sumPack">—</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-key" data-t="sum_qty">Quantity</div>
+          <div class="s-val" id="sumQty">—</div>
+        </div>
+        <div class="summary-item" style="grid-column:1/-1;">
+          <div class="s-key" data-t="sum_photos">Photos</div>
+          <div class="s-val" id="sumPhotos">—</div>
+        </div>
+      </div>
+
+      <div class="summary-photos-strip" id="summaryStrip"></div>
+    </div>
+
+    <!-- Upload progress (hidden until submit) -->
+    <div id="uploadProgress" style="display:none;margin-top:16px;">
+      <div class="overall-progress">
+        <div class="overall-progress-label" id="overallLabel">Preparing upload…</div>
+        <div class="overall-track">
+          <div class="overall-fill" id="overallFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary btn-back" data-prev="5" data-t="btn_back">← Back</button>
+      <button class="btn btn-primary btn-lg" id="submitBtn" data-t="btn_submit">Submit Photos</button>
+    </div>
+  </div>
+
+</main><!-- /main-content -->
+
+<!-- ── WHATSAPP BOTTOM SHEET ─────────────────────────────── -->
+<div class="modal-overlay" id="waModal" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-handle-bar"></div>
+    <div class="modal-body">
+      <div class="success-icon">✅</div>
+      <h3 data-t="wa_title" style="text-align:center;margin-bottom:6px;">Share on WhatsApp to Confirm</h3>
+      <p  data-t="wa_subtitle" class="text-center text-sm">
+        Send this message to confirm your order. Your photos are being saved.
+      </p>
+      <div class="wa-message-box" id="waMessage"></div>
+      <button id="waOpenBtn" class="btn btn-whatsapp btn-full btn-lg">
+        <span data-t="wa_btn">📲 Open WhatsApp</span>
+      </button>
+      <button id="waLater" class="btn btn-secondary btn-full" style="margin-top:10px;">
+        <span data-t="wa_later">I'll share later</span>
+      </button>
+      <button id="waClose" class="hidden"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="tutorial.html" data-t="nav_tutorial">How to Use</a>
+    <a href="contact.html"  data-t="nav_contact">Contact Us</a>
+    <a href="legal.html"    data-t="nav_legal">Legal &amp; Policy</a>
+  </div>
+  <p>© 2024 Iconic Prints. All rights reserved.</p>
+</footer>
+
+<!-- ── SCRIPTS ───────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="shared.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
